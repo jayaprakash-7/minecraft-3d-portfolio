@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#121a13">
+  <meta name="description" content="Jayaprakash G — Realistic 3D Minecraft-inspired engineering portfolio featuring interactive voxel world, block mining, embedded robotics, and Generative AI automation.">
+  <title>Jayaprakash G | Live 3D Voxel Engineering Portfolio</title>
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-box">
+      <div class="loading-logo">JAYAPRAKASH G</div>
+      <div class="loading-subtitle">VOXEL ENGINEERING WORLD · Class of 2026</div>
+      <div class="mc-progress-bar">
+        <div class="mc-progress-fill" id="loading-fill"></div>
+      </div>
+      <div class="loading-status" id="loading-text">Generating procedural voxel terrain...</div>
+    </div>
+  </div>
+
+  <!-- 3D Canvas Viewport -->
+  <div id="canvas-wrap">
+    <canvas id="webgl-canvas"></canvas>
+  </div>
+
+  <!-- Top Navigation Bar -->
+  <nav class="top-nav" aria-label="Main Navigation">
+    <a href="#home" class="nav-brand nav-link" data-section="home">
+      <div class="brand-icon">JG</div>
+      <span class="brand-title">Jayaprakash G</span>
+    </a>
+
+    <div class="nav-links" id="nav-links">
+      <a href="#home" class="nav-link" data-section="home">Spawn</a>
+      <a href="#about" class="nav-link" data-section="about">About Me</a>
+      <a href="#skills" class="nav-link" data-section="skills">Skill Tree</a>
+      <a href="#projects" class="nav-link" data-section="projects">Projects</a>
+      <a href="#experience" class="nav-link" data-section="experience">Experience</a>
+      <a href="#contact" class="nav-link" data-section="contact">Comms</a>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn-nav" id="toggle-2d-btn" title="Toggle 2D / 3D Layout">📄 2D View</button>
+      <button class="btn-nav" id="reset-world-btn" title="Reset all mined blocks and camera">✦ Reset</button>
+      <button class="btn-nav accent" id="open-settings-btn" title="Settings">⚙ Settings</button>
+      <button class="btn-nav" id="mobile-menu-btn" aria-label="Toggle Navigation">☰</button>
+    </div>
+  </nav>
+
+  <!-- Minecraft 9-Slot Hotbar -->
+  <div class="hotbar-container" role="toolbar" aria-label="Voxel Hotbar Controls">
+    <div class="hotbar-slot selected" data-action="mine" title="Pickaxe: Hold click on blocks to mine">
+      <span class="hotbar-num">1</span>
+      <span class="hotbar-icon">⛏</span>
+      <span class="hotbar-label">Pickaxe: Mine</span>
+    </div>
+    <div class="hotbar-slot" data-action="home" title="Spawn Plaza">
+      <span class="hotbar-num">2</span>
+      <span class="hotbar-icon">🗺</span>
+      <span class="hotbar-label">Spawn Plaza</span>
+    </div>
+    <div class="hotbar-slot" data-action="about" title="Player Bio & Education">
+      <span class="hotbar-num">3</span>
+      <span class="hotbar-icon">📖</span>
+      <span class="hotbar-label">About Cottage</span>
+    </div>
+    <div class="hotbar-slot" data-action="skills" title="Technical Skill Tree">
+      <span class="hotbar-num">4</span>
+      <span class="hotbar-icon">⚡</span>
+      <span class="hotbar-label">Skill Garden</span>
+    </div>
+    <div class="hotbar-slot" data-action="projects" title="Robotics & Hardware Missions">
+      <span class="hotbar-num">5</span>
+      <span class="hotbar-icon">🚀</span>
+      <span class="hotbar-label">Project Labs</span>
+    </div>
+    <div class="hotbar-slot" data-action="experience" title="Ignite Skylabs & Certifications">
+      <span class="hotbar-num">6</span>
+      <span class="hotbar-icon">📜</span>
+      <span class="hotbar-label">Experience</span>
+    </div>
+    <div class="hotbar-slot" data-action="contact" title="Nether Comms Portal">
+      <span class="hotbar-num">7</span>
+      <span class="hotbar-icon">✉</span>
+      <span class="hotbar-label">Comms Portal</span>
+    </div>
+    <div class="hotbar-slot" data-action="daynight" id="slot-daynight" title="Toggle Day / Night">
+      <span class="hotbar-num">8</span>
+      <span class="hotbar-icon">☀️</span>
+      <span class="hotbar-label">Time: Day/Night</span>
+    </div>
+    <div class="hotbar-slot" data-action="audio" id="slot-audio" title="Toggle Sound Synthesis">
+      <span class="hotbar-num">9</span>
+      <span class="hotbar-icon">🔊</span>
+      <span class="hotbar-label">Audio Synth</span>
+    </div>
+  </div>
+
+  <!-- Block Hover Tooltip -->
+  <div id="block-tooltip">GRASS BLOCK · HOLD TO MINE</div>
+
+  <!-- Mining Ring Progress Indicator -->
+  <div id="mining-indicator">
+    <div class="mining-crosshair"></div>
+    <div id="mining-ring"></div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast">✦ Welcome to Jayaprakash's Voxel World!</div>
+
+  <!-- Realtime FPS Stats -->
+  <div class="hud-stats" id="fps-counter">60 FPS</div>
+
+  <!-- Detail Modal -->
+  <div class="portfolio-modal" id="portfolio-modal" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="modal-title">Mission File</h2>
+        <button class="btn-close" id="modal-close" aria-label="Close modal">✕ ESC</button>
+      </div>
+      <div class="modal-content-area" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Settings Side Drawer -->
+  <aside class="settings-drawer" id="settings-panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h3>⚙ WORLD SETTINGS</h3>
+      <button class="btn-close" id="settings-close">✕</button>
+    </div>
+
+    <div class="settings-group">
+      <label for="graphics-select">Graphics Quality</label>
+      <select id="graphics-select">
+        <option value="high" selected>High (RTX / Acer Nitro)</option>
+        <option value="medium">Medium (Balanced)</option>
+        <option value="low">Low (Performance Mode)</option>
+      </select>
+    </div>
+
+    <div class="settings-group">
+      <label>
+        <input type="checkbox" id="weather-toggle" style="margin-right:8px;"> Enable Voxel Rain
+      </label>
+    </div>
+
+    <div class="settings-group">
+      <label for="respawn-slider">Block Respawn Delay: <strong id="respawn-val">12s</strong></label>
+      <input type="range" id="respawn-slider" min="3" max="30" step="1" value="12">
+    </div>
+
+    <div class="settings-group" style="margin-top:30px;">
+      <p style="font-size:0.8rem; color:#8ba08a;">
+        Tip: Left click & drag to rotate camera. Scroll wheel to zoom. Hold click on any 3D voxel block to mine it with physics particles!
+      </p>
+    </div>
+  </aside>
+
+  <!-- Conventional 2D Portfolio View (For instant non-WebGL fallback and fast reading) -->
+  <div id="conventional-container"></div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
